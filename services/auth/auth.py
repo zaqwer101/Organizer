@@ -75,6 +75,9 @@ def auth():
         else:
             return error("invalid token", 401)
 
+@app.route('/info', methods=['GET'])
+def get_service_info():
+    return jsonify({"token_ttl": token_ttl})
 
 def generate_token(user):
     letters = string.ascii_letters

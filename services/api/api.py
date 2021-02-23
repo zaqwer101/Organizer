@@ -117,6 +117,14 @@ def auth():
         return jsonify({"token": token})
 
 
+@app.route('/info', methods=['GET'])
+def get_services_metadata():
+    """ Получить информацию о настройках сервисов """
+    auth_info = requests.get(auth_url + '/info') # пока только auth
+
+    metadata = {"auth": auth_info.json()}
+    return jsonify(metadata)
+
 @app.route('/shoplist', methods=['GET'])
 @auth_needed
 def shoplist_get_items():
