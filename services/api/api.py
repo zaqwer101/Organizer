@@ -137,29 +137,35 @@ def shoplist_get_items():
     return error("incorrect input", 400)
 
 
-@app.route('/shoplist', methods=['POST'])
+@app.route('/shoplist', methods=['POST', 'DELETE'])
 @auth_needed
-@check_params(params_post=['name'])
-def shoplist_add_item():
-    token = request.get_json()['token']
-    user = check_auth_token(token)
-    name = request.get_json()['name']
+@check_params(params_post=['name'], params_delete=['name', 'shop'])
+def shoplist():
+    token   = request.get_json()['token']
+    user    = check_auth_token(token)
+    name    = request.get_json()['name']
 
-    if 'shop' in request.get_json():
-        shop = request.get_json()['shop']
-    else:
-        shop = None
-
-    params = {"user": user, "name": name, "bought": "false", "shop": shop}
-
-    if 'amount' in request.get_json():
-        params['amount'] = request.get_json()['amount']
-    
-    r = requests.post(shoplist_url, json=params)
-    if r.status_code == 200:
-        return make_response(jsonify({"status": "success"}), 201)
-    else:
+    if request.method == 'POST':
+        if 'shop' in request.get_json():
+            shop = request.get_json()['shop']
+        else:
+            shop = None
+        params = {"user": user, "name": name, "bought": "false", "shop": shop}
+        if 'amount' in request.get_json():
+            params['amount'] = request.get_json()['amount'] 
+        r = requests.post(shoplist_url, json=params)
+        if r.status_code == 200:
+            return make_response(jsonify({"status": "success"}), 201)
         return r.json()
+
+    elif request.method == 'DELETE':
+        shop = request.get_json()['shop']
+        params = {"user": user, "name": name, "shop": shop}
+        r = requests.delete(shoplist_url, json=params)
+        if r.status_code == 200:
+            return jsonify({"status": "success"})
+        return r.json()
+
 
 
 @app.route('/shoplist/bought', methods=['POST'])
@@ -176,19 +182,6 @@ def bought():
         shop = 'null'
     r = requests.post(f'{shoplist_url}/bought',
                       json={"user": user, "name": name, "bought": bought, "shop": shop})
-    return r.json()
-
-
-@app.route('/shoplist', methods=['DELETE'])
-@auth_needed
-@check_params(params_delete=['name'])
-def shoplist_delete_item():
-    token = request.get_json()['token']
-    user = check_auth_token(token)
-    name = request.get_json()['name']
-    r = requests.delete(shoplist_url, json={'user': user, 'name': name})
-    if r.status_code == 200:
-        return jsonify({"status": "success"})
     return r.json()
 
 

@@ -45,33 +45,32 @@ def check_params(params_get=None, params_post=None, params_delete=None, params_p
 
 @app.route('/', methods=['GET', 'POST', 'DELETE'])
 @check_params(params_get=['user'],
-              params_post=['user', 'name'],  # amount и shop - необязательные поля
-              params_delete=['user', 'name'])
+              params_post=['user', 'name', 'shop'],
+              params_delete=['user', 'name', 'shop'])
 def shoplist():
     if request.method == 'GET':
         user = request.args['user']
+        app.logger.info(f"GET / params: {request.args}")
         return get_items_by_user(user)
 
     if request.method == 'POST':
         user = request.get_json()['user']
         name = request.get_json()['name']
-
-        if 'shop' in request.get_json():
-            shop = request.get_json()['shop']
-        else:
-            shop = None
+        shop = request.get_json()['shop']
 
         amount = 1
         if 'amount' in request.get_json():
             amount = request.get_json()['amount']
-
+        app.logger.info(f"POST / params: " + str(request.get_json()))
         r = add_item(user, name, amount, shop)
         return r.json()
 
     if request.method == 'DELETE':
         user = request.get_json()['user']
         name = request.get_json()['name']
-        r = database_request({"name": name, "user": user}, 'DELETE')
+        shop = request.get_json()['shop']
+        app.logger.info("DELETE / params: " + str(request.get_json()))
+        r = database_request({"name": name, "user": user, "shop": shop}, 'DELETE')
         return r.json()
 
 
