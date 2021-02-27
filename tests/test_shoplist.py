@@ -7,7 +7,7 @@ def before():
     shared._before()
 
 
-def test_add_success():
+def test_add():
     """ добавление элемента в список. Успешные сценарии """
     token = register('test', 'testpassword')
     request('POST', '/shoplist', {"name": "item1", "token": token, "shop": "shop1"})
@@ -33,18 +33,49 @@ def test_add_success():
     assert data[0]['amount'] == 2
 
 
-def test_delete_success():
+def test_add_multiple_shops():
     token = register('test', 'testpassword')
-    request('POST', '/shoplist', {"name": "item1", "token": token})
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop2"})
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop2"})
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop2"})
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop2"})
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop2"})
+    data = get_shoplist_items(token)
+    assert data[0]['shop'] == 'shop2'
+    assert data[0]['amount'] == 5
+
+
+def test_delete_with_shop():
+    token = register('test', 'testpassword')
+    request('POST', '/shoplist', {"name": "item1", "token": token, "shop": "shop1"})
+    data = get_shoplist_items(token)
+    assert data[0]['name'] == 'item1'
+
+    request('DELETE', '/shoplist', {"name": "item1", "token": token, "shop": "shop1"})
+    data = get_shoplist_items(token)
+    assert len(data) == 0
+
+    request('POST', '/shoplist', {"name": "item1", "token": token, "shop": "shop1"})
+    data = get_shoplist_items(token)
+    assert data[0]['name'] == 'item1'
+
+    request('DELETE', '/shoplist', {"name": "item1", "token": token, "shop": "shop2"})
+    data = get_shoplist_items(token)
+    assert len(data) == 1 # удалиться не должен, т.к. магазины не совпадают
+
+
+def test_delete_without_shop():
+    token = register('test', 'testpassword')
+    request('POST', '/shoplist', {"name": "item1", "token": token, "shop": "shop1"})
     data = get_shoplist_items(token)
     assert data[0]['name'] == 'item1'
 
     request('DELETE', '/shoplist', {"name": "item1", "token": token})
     data = get_shoplist_items(token)
-    assert len(data) == 0
+    assert len(data) == 1 # удалиться не должен, т.к. магазин передан как null
     
 
-def test_setbought_success():
+def test_setbought():
     token = register('test', 'testpassword')
     request('POST', '/shoplist', {"name": "item1", "token": token})
     data = get_shoplist_items(token)
