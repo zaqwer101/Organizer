@@ -44,6 +44,14 @@ def test_add_multiple_shops():
     assert data[0]['shop'] == 'shop2'
     assert data[0]['amount'] == 5
 
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop3"})
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop3"})
+    request('POST', '/shoplist', {"name": "item3", "token": token, "shop": "shop3"})
+    data = get_shoplist_items(token)
+    assert len(data) == 2
+    assert data[1]['shop'] == 'shop3'
+    assert data[1]['amount'] == 3
+
 
 def test_delete_with_shop():
     token = register('test', 'testpassword')
