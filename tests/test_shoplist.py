@@ -92,3 +92,26 @@ def test_setbought():
     request('POST', '/shoplist/bought', {"name": "item1", "token": token, "bought": "true"})
     data = get_shoplist_items(token)
     assert data[0]['bought'] == 'true'
+
+
+def test_setbought_shop():
+    token = register('test', 'testpassword')
+    request('POST', '/shoplist', {"name": "item1", "token": token})
+    request('POST', '/shoplist', {"name": "item1", "token": token, "shop": "shop1"})
+    request('POST', '/shoplist', {"name": "item1", "token": token, "shop": "shop2"})
+    data = get_shoplist_items(token)
+    assert data[0]["bought"] == 'false'
+    assert data[1]["bought"] == 'false'
+    assert data[2]["bought"] == 'false'
+
+    request('POST', '/shoplist/bought', {"name": "item1", "token": token, "bought": "true"})
+    data = get_shoplist_items(token)
+    assert data[0]["bought"] == 'true'
+    assert data[1]["bought"] == 'false'
+    assert data[2]["bought"] == 'false'
+
+    request('POST', '/shoplist/bought', {"name": "item1", "token": token, "bought": "true", "shop": "shop1"})
+    data = get_shoplist_items(token)
+    assert data[0]["bought"] == 'true'
+    assert data[1]["bought"] == 'true'
+    assert data[2]["bought"] == 'false'

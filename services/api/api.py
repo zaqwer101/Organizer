@@ -177,7 +177,7 @@ def bought():
     name = request.get_json()['name']
     bought = request.get_json()['bought']
     if 'shop' in request.get_json():
-        shop = request.get_json().keys()['shop']
+        shop = request.get_json()['shop']
     else:
         shop = ''
     r = requests.post(f'{shoplist_url}/bought',
