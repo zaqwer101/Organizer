@@ -149,7 +149,7 @@ def shoplist():
         if 'shop' in request.get_json():
             shop = request.get_json()['shop']
         else:
-            shop = None
+            shop = ''
         params = {"user": user, "name": name, "bought": "false", "shop": shop}
         if 'amount' in request.get_json():
             params['amount'] = request.get_json()['amount'] 
@@ -179,7 +179,7 @@ def bought():
     if 'shop' in request.get_json():
         shop = request.get_json().keys()['shop']
     else:
-        shop = None
+        shop = ''
     r = requests.post(f'{shoplist_url}/bought',
                       json={"user": user, "name": name, "bought": bought, "shop": shop})
     return r.json()
