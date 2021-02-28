@@ -66,12 +66,12 @@ def database_handler():
             if arg not in service_params:
                 query[arg] = request.args[arg]
                 
-        app.logger.info(query)
+        app.logger.info(f'GET query: {query}')
         db = client[db_name]
         collection = db[collection_name]
 
         for elem in collection.find(query, {'_id': False}):
-            app.logger.info(elem)
+            app.logger.info(f'  Elem: {elem}')
             result.append(elem)
         if len(result) == 0:
             return error("not found", 404)
@@ -85,12 +85,12 @@ def database_handler():
         db = client[db_name]
         collection = db[collection_name]
         data = request.get_json()['data']
-        app.logger.info(data)
+        app.logger.info(f'POST data: {data}')
 
         if len(data) != 0:
             out = []
             for elem in request.get_json()['data']:
-                app.logger.info(elem)
+                app.logger.info(f'   Elem: {elem}')
                 out.append(str(collection.insert_one(elem).inserted_id))
             return make_response(jsonify({"output": out}), 201)  # объект создан
         else:
@@ -103,7 +103,7 @@ def database_handler():
         db = client[db_name]
         collection = db[collection_name]
         data = request.get_json()['data']
-        app.logger.info(data)
+        app.logger.info(f'DELETE data: {data}')
 
         if len(data) != 0:
             for elem in request.get_json()['data']:
@@ -118,7 +118,8 @@ def database_handler():
         collection_name = request.get_json()['collection']
         db = client[db_name]
         collection = db[collection_name]
-        app.logger.info(str(request.get_json()['query']) + ", " + str(request.get_json()['data']))
+        app.logger.info(f'PUT query: {request.get_json()["query"]}')
+        app.logger.info(f'PUT data: {request.get_json()["data"]}')
 
         result = collection.update_one(
             request.get_json()['query'],
