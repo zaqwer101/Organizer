@@ -95,6 +95,10 @@ def auth():
     # проверяем токен авторизации
     if request.method == 'GET':
         token = request.args['token']
+
+        if not token:
+            return error("token not set", 401)
+
         user = check_auth_token(token)
         if user:
             return jsonify({"user": user})
