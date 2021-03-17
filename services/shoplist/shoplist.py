@@ -91,7 +91,7 @@ def set_bought():
 
 
 def add_item(user, name, amount, shop):
-    item = get_item(user, name, shop)
+    item = get_item_by_name(user, name, shop)
     if item:  # значит такой элемент уже есть в БД
         app.logger.info(f'Item "{name}" found in database')
         data = {}
@@ -105,7 +105,7 @@ def add_item(user, name, amount, shop):
 
 
 def change_bought(user, name, shop, bought):
-    item = get_item(user, name, shop)
+    item = get_item_by_name(user, name, shop)
     if item:
         if item['bought'] == bought:
             return True
@@ -118,18 +118,26 @@ def change_bought(user, name, shop, bought):
         return False
 
 
-def get_item(user, name, shop):
+def get_item_by_name(user, name, shop):
     """ Найти элемент пользователя с такими параметрами """
     data = {"user": user, "name": name, "shop": shop}
-    app.logger.info(f'get_item(): Item to found: {data}')
+    app.logger.info(f'get_item_by_name(): Item to found: {data}')
     r = database_request(data, 'GET')
-    app.logger.info(f'get_item(): DB GET response: {r.json()}')
+    app.logger.info(f'get_item_by_name(): DB GET response: {r.json()}')
     if r.status_code == 400:
         error("incorrect params", 400)
     if r.status_code == 404:
         return None
     item = r.json()[0]
     return item
+
+
+def get_item_by_id(user, id):
+    """ Найти элемент по его ID """
+    data = {"user": user, "_id": id}
+    app.logger.info(f'get_item_by_id(): Item to found: {data}')
+    r = database_request(data, 'GET')
+    app.logger.info(f'get_item_by_id(): DB GET response: {r.json()}')
 
 
 def get_items_by_user(user):

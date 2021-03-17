@@ -70,7 +70,9 @@ def database_handler():
         db = client[db_name]
         collection = db[collection_name]
 
-        for elem in collection.find(query, {'_id': False}):
+        for elem in collection.find(query):
+            elem['id'] = str(elem['_id'])
+            del elem['_id']
             app.logger.info(f'  Elem: {elem}')
             result.append(elem)
         if len(result) == 0:
