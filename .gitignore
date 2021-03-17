@@ -1,0 +1,4 @@
+services/data
+*.pyc
+*.crt
+*.key
